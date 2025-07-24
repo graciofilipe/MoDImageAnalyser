@@ -55,6 +55,6 @@ images:
 # Set default substitution variables
 substitutions:
   _REGION: "us-central1"
-  _REPOSITORY: "my-repository"
-  _IMAGE_NAME: "my-image"
-  _SERVICE_NAME: "my-service"
+  _REPOSITORY: "mod-image-analyser-repo"
+  _IMAGE_NAME: "mod-image-analyser-image"
+  _SERVICE_NAME: "mod-image-analyser-service"
