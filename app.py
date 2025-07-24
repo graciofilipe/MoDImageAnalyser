@@ -14,7 +14,7 @@ vertexai.init(project=PROJECT_ID, location=LOCATION)
 def generate_description(image_bytes):
     """Generates a description for an image."""
     try:
-        model = GenerativeModel("gemini-1.0-pro-vision")
+        model = GenerativeModel("gemini-2.5-flash")
         image = Part.from_data(image_bytes, mime_type="image/jpeg")
         response = model.generate_content([image, "Describe this image"])
         return response.text
