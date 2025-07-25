@@ -43,7 +43,6 @@ def plot_bounding_boxes(img, bounding_boxes):
     """
     Plots bounding boxes on an image with markers for each a name, using PIL, normalized coordinates, and different colors.
     """
-    st.write("Original bounding boxes received:", bounding_boxes)
     draw = ImageDraw.Draw(img)
     colors = [
     'red', 'green', 'blue', 'yellow', 'orange', 'pink', 'purple', 'brown', 'gray', 'beige',
@@ -52,22 +51,17 @@ def plot_bounding_boxes(img, bounding_boxes):
     ] + [colorname for (colorname, colorcode) in ImageColor.colormap.items()]
 
     bounding_boxes = parse_json(bounding_boxes)
-    st.write("Parsed bounding boxes:", bounding_boxes)
     font = ImageFont.truetype("NotoSansCJK-Regular.ttc", size=14)
 
     parsed_bounding_boxes = json.loads(bounding_boxes)
-    st.write("Loaded bounding boxes JSON:", parsed_bounding_boxes)
 
     for i, bounding_box in enumerate(parsed_bounding_boxes):
-        st.write(f"Processing bounding box {i}:", bounding_box)
         color = colors[i % len(colors)]
         width, height = img.size
         abs_y1 = int(bounding_box["box_2d"][0]/1000 * height)
         abs_x1 = int(bounding_box["box_2d"][1]/1000 * width)
         abs_y2 = int(bounding_box["box_2d"][2]/1000 * height)
         abs_x2 = int(bounding_box["box_2d"][3]/1000 * width)
-
-        st.write(f"Coordinates for box {i}: y1={abs_y1}, x1={abs_x1}, y2={abs_y2}, x2={abs_x2}")
 
         if abs_x1 > abs_x2:
             abs_x1, abs_x2 = abs_x2, abs_x1
