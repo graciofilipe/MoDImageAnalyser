@@ -128,12 +128,6 @@ if uploaded_file is not None:
                     im = Image.open(io.BytesIO(image_bytes))
                     original_width, original_height = im.size
                     st.write("Original image size:", im.size)
-                    im.thumbnail([640,640], Image.Resampling.LANCZOS)
-                    resized_width, resized_height = im.size
-                    st.write("Resized image size:", im.size)
-                    width_ratio = resized_width / original_width
-                    height_ratio = resized_height / original_height
-
                     model_name = "gemini-2.5-pro"
                     bounding_box_system_instructions = """
                         Return bounding boxes as a JSON array with labels. Never return masks or code fencing. Limit to 25 objects.
@@ -160,6 +154,10 @@ if uploaded_file is not None:
 
                     # Resize the image to the column width
                     im.thumbnail([column_width, column_width], Image.Resampling.LANCZOS)
+                    resized_width, resized_height = im.size
+                    st.write("Resized image size:", im.size)
+                    width_ratio = resized_width / original_width
+                    height_ratio = resized_height / original_height
 
                     st.image(plot_bounding_boxes(im, response.text, width_ratio, height_ratio), caption="Detected Objects")
                 except Exception as e:
