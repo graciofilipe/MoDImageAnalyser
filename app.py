@@ -39,7 +39,7 @@ def parse_json(json_output: str):
             break  # Exit the loop once "```json" is found
     return json_output
 
-def plot_bounding_boxes(img, bounding_boxes, width_ratio, height_ratio):
+def plot_bounding_boxes(img, bounding_boxes):
     """
     Plots bounding boxes on an image with markers for each a name, using PIL, normalized coordinates, and different colors.
     """
@@ -62,10 +62,10 @@ def plot_bounding_boxes(img, bounding_boxes, width_ratio, height_ratio):
         st.write(f"Processing bounding box {i}:", bounding_box)
         color = colors[i % len(colors)]
         width, height = img.size
-        abs_y1 = int(bounding_box["box_2d"][0]/1000 * height / height_ratio)
-        abs_x1 = int(bounding_box["box_2d"][1]/1000 * width / width_ratio)
-        abs_y2 = int(bounding_box["box_2d"][2]/1000 * height / height_ratio)
-        abs_x2 = int(bounding_box["box_2d"][3]/1000 * width / width_ratio)
+        abs_y1 = int(bounding_box["box_2d"][0]/1000 * height)
+        abs_x1 = int(bounding_box["box_2d"][1]/1000 * width)
+        abs_y2 = int(bounding_box["box_2d"][2]/1000 * height)
+        abs_x2 = int(bounding_box["box_2d"][3]/1000 * width)
 
         st.write(f"Coordinates for box {i}: y1={abs_y1}, x1={abs_x1}, y2={abs_y2}, x2={abs_x2}")
 
@@ -152,14 +152,27 @@ if uploaded_file is not None:
                     # Get the column width
                     column_width = st.session_state.get('column_width', 640)
 
-                    # Resize the image to the column width
+                    # Draw bounding boxes on the original image
+                    image_with_boxes = plot_bounding_boxes(im.copy(), response.text)
+
+                    # Offer the user to download the image with bounding boxes
+                    output_buffer = io.BytesIO()
+                    image_with_boxes.save(output_buffer, format="PNG")
+                    output_buffer.seek(0)  # Go to the beginning of the buffer
+
+                    st.download_button(
+                        label="Download Image with Bounding Boxes",
+                        data=output_buffer,
+                        file_name="image_with_boxes.png",
+                        mime="image/png"
+                    )
+
+                    # Resize the image to the column width for display
                     im.thumbnail([column_width, column_width], Image.Resampling.LANCZOS)
                     resized_width, resized_height = im.size
                     st.write("Resized image size:", im.size)
-                    width_ratio = resized_width / original_width
-                    height_ratio = resized_height / original_height
 
-                    st.image(plot_bounding_boxes(im, response.text, width_ratio, height_ratio), caption="Detected Objects")
+                    st.image(image_with_boxes, caption="Detected Objects")
                 except Exception as e:
                     st.error(f"An error occurred during object detection: {e}")
                     st.error(f"Full error: {traceback.format_exc()}")
