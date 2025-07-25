@@ -38,12 +38,11 @@ def parse_json(json_output: str):
             break  # Exit the loop once "```json" is found
     return json_output
 
-def plot_bounding_boxes(im, bounding_boxes):
+def plot_bounding_boxes(img, bounding_boxes):
     """
     Plots bounding boxes on an image with markers for each a name, using PIL, normalized coordinates, and different colors.
     """
     st.write("Original bounding boxes received:", bounding_boxes)
-    img = im.copy()
     width, height = img.size
     draw = ImageDraw.Draw(img)
     colors = [
@@ -114,6 +113,7 @@ if uploaded_file is not None:
             with st.spinner("Detecting objects..."):
                 try:
                     im = Image.open(io.BytesIO(image_bytes))
+                    original_im = im.copy()
                     st.write("Original image size:", im.size)
                     im.thumbnail([640,640], Image.Resampling.LANCZOS)
                     st.write("Resized image size:", im.size)
@@ -139,7 +139,7 @@ if uploaded_file is not None:
                         },
                     )
 
-                    st.image(plot_bounding_boxes(im, response.text), caption="Detected Objects", use_column_width=True)
+                    st.image(plot_bounding_boxes(original_im, response.text), caption="Detected Objects", use_column_width=True)
                 except Exception as e:
                     st.error(f"An error occurred during object detection: {e}")
                     st.error(f"Full error: {traceback.format_exc()}")
