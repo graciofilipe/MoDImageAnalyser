@@ -113,9 +113,16 @@ if uploaded_file is not None:
                         If an object is present multiple times, name them according to their unique characteristic (colors, size, position, unique characteristics, etc..).
                           """
 
+                    # Convert the PIL image back to bytes
+                    buffer = io.BytesIO()
+                    im.save(buffer, format="PNG")
+                    image_bytes_for_detection = buffer.getvalue()
+
+                    image_part = Part.from_data(image_bytes_for_detection, mime_type="image/png")
+
                     model = GenerativeModel(model_name)
                     response = model.generate_content(
-                        [bounding_box_system_instructions, detection_prompt, im],
+                        [bounding_box_system_instructions, detection_prompt, image_part],
                         generation_config={
                             "temperature": 0.5,
                         },
