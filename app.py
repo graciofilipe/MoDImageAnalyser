@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit.components.v1 as components
 from google.cloud import aiplatform
 import vertexai
 from vertexai.generative_models import GenerativeModel, Part
@@ -86,6 +87,18 @@ if uploaded_file is not None:
     st.image(uploaded_file, caption="Uploaded Image.", use_column_width=True)
     image_bytes = uploaded_file.read()
 
+    # Get the column width
+    components.html(
+        """
+        <script>
+        const stColumn = window.parent.document.querySelector('.main .block-container');
+        const stColumnWidth = stColumn.clientWidth;
+        window.parent.st.setSessionState({ 'column_width': stColumnWidth });
+        </script>
+        """,
+        height=0,
+    )
+
     # Initialize chat history
     if "messages" not in st.session_state:
         st.session_state.messages = []
@@ -139,7 +152,13 @@ if uploaded_file is not None:
                         },
                     )
 
-                    st.image(plot_bounding_boxes(original_im, response.text), caption="Detected Objects", use_column_width=True)
+                    # Get the column width
+                    column_width = st.session_state.get('column_width', 640)
+
+                    # Resize the image to the column width
+                    im.thumbnail([column_width, column_width], Image.Resampling.LANCZOS)
+
+                    st.image(plot_bounding_boxes(im, response.text), caption="Detected Objects")
                 except Exception as e:
                     st.error(f"An error occurred during object detection: {e}")
                     st.error(f"Full error: {traceback.format_exc()}")
