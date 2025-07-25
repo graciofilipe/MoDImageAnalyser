@@ -20,7 +20,7 @@ vertexai.init(project=PROJECT_ID, location=LOCATION)
 def generate_response(image_bytes, question):
     """Generates a response to a question about an image."""
     try:
-        model = GenerativeModel("gemini-2.5-flash")
+        model = GenerativeModel("gemini-2.5-pro")
         image = Part.from_data(image_bytes, mime_type="image/jpeg")
         response = model.generate_content([image, question])
         return response.text
@@ -107,7 +107,7 @@ if uploaded_file is not None:
                     im = Image.open(io.BytesIO(image_bytes))
                     im.thumbnail([640,640], Image.Resampling.LANCZOS)
 
-                    model_name = "gemini-1.5-pro"
+                    model_name = "gemini-2.5-pro"
                     bounding_box_system_instructions = """
                         Return bounding boxes as a JSON array with labels. Never return masks or code fencing. Limit to 25 objects.
                         If an object is present multiple times, name them according to their unique characteristic (colors, size, position, unique characteristics, etc..).
