@@ -139,7 +139,7 @@ if uploaded_file is not None:
                         },
                     )
 
-                    st.image(plot_bounding_boxes(original_im, response.text), caption="Detected Objects", use_column_width=True)
+                    st.image(plot_bounding_boxes(im, response.text), caption="Detected Objects", use_column_width=True)
                 except Exception as e:
                     st.error(f"An error occurred during object detection: {e}")
                     st.error(f"Full error: {traceback.format_exc()}")
