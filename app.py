@@ -151,6 +151,7 @@ if uploaded_file is not None:
                         },
                     )
 
+
                     # Get the column width
                     column_width = st.session_state.get('column_width', 640)
 
@@ -158,6 +159,7 @@ if uploaded_file is not None:
                     im.thumbnail([column_width, column_width], Image.Resampling.LANCZOS)
 
                     st.image(plot_bounding_boxes(im, response.text, original_width, original_height), caption="Detected Objects")
+
                 except Exception as e:
                     st.error(f"An error occurred during object detection: {e}")
                     st.error(f"Full error: {traceback.format_exc()}")
