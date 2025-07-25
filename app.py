@@ -9,6 +9,7 @@ from PIL import ImageColor
 import io
 import json
 import random
+import traceback
 
 # Get project ID from environment variable
 PROJECT_ID = os.environ.get("GCP_PROJECT")
@@ -41,6 +42,7 @@ def plot_bounding_boxes(im, bounding_boxes):
     """
     Plots bounding boxes on an image with markers for each a name, using PIL, normalized coordinates, and different colors.
     """
+    st.write("Original bounding boxes received:", bounding_boxes)
     img = im.copy()
     width, height = img.size
     draw = ImageDraw.Draw(img)
@@ -51,14 +53,21 @@ def plot_bounding_boxes(im, bounding_boxes):
     ] + [colorname for (colorname, colorcode) in ImageColor.colormap.items()]
 
     bounding_boxes = parse_json(bounding_boxes)
+    st.write("Parsed bounding boxes:", bounding_boxes)
     font = ImageFont.truetype("NotoSansCJK-Regular.ttc", size=14)
 
-    for i, bounding_box in enumerate(json.loads(bounding_boxes)):
+    parsed_bounding_boxes = json.loads(bounding_boxes)
+    st.write("Loaded bounding boxes JSON:", parsed_bounding_boxes)
+
+    for i, bounding_box in enumerate(parsed_bounding_boxes):
+        st.write(f"Processing bounding box {i}:", bounding_box)
         color = colors[i % len(colors)]
         abs_y1 = int(bounding_box["box_2d"][0]/1000 * height)
         abs_x1 = int(bounding_box["box_2d"][1]/1000 * width)
         abs_y2 = int(bounding_box["box_2d"][2]/1000 * height)
         abs_x2 = int(bounding_box["box_2d"][3]/1000 * width)
+
+        st.write(f"Coordinates for box {i}: y1={abs_y1}, x1={abs_x1}, y2={abs_y2}, x2={abs_x2}")
 
         if abs_x1 > abs_x2:
             abs_x1, abs_x2 = abs_x2, abs_x1
@@ -105,7 +114,9 @@ if uploaded_file is not None:
             with st.spinner("Detecting objects..."):
                 try:
                     im = Image.open(io.BytesIO(image_bytes))
+                    st.write("Original image size:", im.size)
                     im.thumbnail([640,640], Image.Resampling.LANCZOS)
+                    st.write("Resized image size:", im.size)
 
                     model_name = "gemini-2.5-pro"
                     bounding_box_system_instructions = """
@@ -131,5 +142,6 @@ if uploaded_file is not None:
                     st.image(plot_bounding_boxes(im, response.text), caption="Detected Objects", use_column_width=True)
                 except Exception as e:
                     st.error(f"An error occurred during object detection: {e}")
+                    st.error(f"Full error: {traceback.format_exc()}")
         else:
             st.warning("Please enter a prompt for object detection.")
