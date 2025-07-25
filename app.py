@@ -115,11 +115,10 @@ if uploaded_file is not None:
 
                     model = GenerativeModel(model_name)
                     response = model.generate_content(
-                        [detection_prompt, im],
+                        [bounding_box_system_instructions, detection_prompt, im],
                         generation_config={
                             "temperature": 0.5,
                         },
-                        system_instruction=bounding_box_system_instructions,
                     )
 
                     st.image(plot_bounding_boxes(im, response.text), caption="Detected Objects", use_column_width=True)
